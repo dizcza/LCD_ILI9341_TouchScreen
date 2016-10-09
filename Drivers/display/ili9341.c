@@ -17,7 +17,7 @@ static ADC_HandleTypeDef* hadcY = NULL;
 static uint32_t ADC_ChannelX;
 static uint32_t ADC_ChannelY;
 
-#define ADC_NO_TOUCH_X (4095 - 200)
+#define ADC_NO_TOUCH_X (4095 - 100)
 #define TOUCH_ADC_X_MAX 3600
 #define TOUCH_ADC_X_MIN 500
 #define TOUCH_ADC_Y_MIN 300
@@ -989,8 +989,13 @@ float adc_norm_y(uint32_t y) {
 	return (y - TOUCH_ADC_Y_MIN) * 1.0 / (TOUCH_ADC_Y_MAX - TOUCH_ADC_Y_MIN);
 }
 
+void LCD_relax() {
+	LCD_Write8(0x00);
+}
+
 int8_t LCD_Touch(LCD_Point* p) {
 	if (hadcX == NULL || hadcY == NULL) return -1;
+	LCD_relax();
 	uint32_t x = touchX();
 
 	if (x > ADC_NO_TOUCH_X) {
@@ -1013,3 +1018,4 @@ void LCD_ClearIfNecessary() {
 	  LCD_FillScreen(BLACK);
 	}
 }
+

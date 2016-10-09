@@ -59,8 +59,17 @@ void Error_Handler(void);
 /* USER CODE BEGIN 0 */
 
 void LCD_InitPoint(LCD_Point* p) {
-	p->x = 100;
-	p->y = 100;
+	p->x = -1;
+	p->y = -1;
+}
+
+void LCD_PrintXY(int16_t x, int16_t y) {
+	int16_t x_end = m_cursor_x;
+	LCD_Printf("x = %d  y = %d", x, y);
+	if (m_cursor_x < x_end) {
+		LCD_FillRect(m_cursor_x, m_cursor_y, x_end - m_cursor_x, TXT_SZ, BLACK);
+	}
+	LCD_SetCursor(0, m_cursor_y);
 }
 
 /* USER CODE END 0 */
@@ -97,24 +106,23 @@ int main(void)
 	LCD_Point points[2];
 	LCD_InitPoint(&points[0]);
 	LCD_InitPoint(&points[1]);
-	uint32_t p_cnt = 0;
+	uint32_t p_last_id = 0;
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
   while (1)
   {
-	  if (LCD_Touch(&points[p_cnt % 2]) == 0) {
-		  if (p_cnt >= 2) {
-			  LCD_Point* p_curr = &points[p_cnt % 2];
-			  LCD_Point* p_prev = &points[(p_cnt-1) % 2];
-			  LCD_Printf("x = %d  y = %d\n", p_curr->x, p_curr->y);
+	  while (LCD_Touch(&points[p_last_id % 2]) == 0) {
+		  if (p_last_id > 0) {
+			  LCD_Point* p_curr = &points[p_last_id % 2];
+			  LCD_Point* p_prev = &points[(p_last_id-1) % 2];
+			  LCD_PrintXY(p_curr->x, p_curr->y);
 			  LCD_DrawLine(p_prev->x, p_prev->y, p_curr->x, p_curr->y, WHITE);
 		  }
-		  p_cnt++;
+		  p_last_id++;
 	  }
-//	  LCD_FillRect(0, TXT_SZ, TFTWIDTH, TXT_SZ, BLACK);
-//	  LCD_SetCursor(0, TXT_SZ);
+	  p_last_id = 0;
 	  HAL_Delay(50);
   /* USER CODE END WHILE */
 
