@@ -7,7 +7,6 @@
 #define __LCD_H
 
 #include <stdint.h>
-#include "stm32f4xx_hal.h"
 
 #include "registers.h"
 
@@ -108,8 +107,6 @@ void LCD_WriteRegister16(uint16_t a, uint16_t d);
 uint16_t LCD_Color565(uint8_t r, uint8_t g, uint8_t b);
 
 void LCD_GPIO_Init(void);
-void LCD_InitTouchADC(ADC_HandleTypeDef* hadcX, uint32_t ADC_ChannelX, ADC_HandleTypeDef* hadcY, uint32_t ADC_ChannelY);
-int8_t LCD_Touch(LCD_Point* p);
 void LCD_ClearIfNecessary();
 
 #endif /* __LCD_H */

@@ -38,6 +38,7 @@
 /* USER CODE BEGIN Includes */
 #define TXT_SZ 8 * 1
 #include "lcd.h"
+#include "lcd_touch.h"
 /* USER CODE END Includes */
 
 /* Private variables ---------------------------------------------------------*/
@@ -117,13 +118,14 @@ int main(void)
 		  if (p_last_id > 0) {
 			  LCD_Point* p_curr = &points[p_last_id % 2];
 			  LCD_Point* p_prev = &points[(p_last_id-1) % 2];
-			  LCD_PrintXY(p_curr->x, p_curr->y);
+//			  LCD_PrintXY(p_curr->x, p_curr->y);
 			  LCD_DrawLine(p_prev->x, p_prev->y, p_curr->x, p_curr->y, WHITE);
 		  }
 		  p_last_id++;
+//		  HAL_Delay(20);
 	  }
 	  p_last_id = 0;
-	  HAL_Delay(50);
+//	  HAL_Delay(50);
   /* USER CODE END WHILE */
 
   /* USER CODE BEGIN 3 */
