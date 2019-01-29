@@ -17,7 +17,7 @@ In idle state, PA4 is in interrupt mode awaiting for touches. You can't draw and
 
 * set PA1 to logical 0
 * set PA8 to logical 1
-* set PB10 in input mode, pullup
+* set PB10 in input mode
 * set PA4 in analog mode
 * get value from ADC2 channel 4
 
@@ -27,7 +27,7 @@ In idle state, PA4 is in interrupt mode awaiting for touches. You can't draw and
 * disable EXTI4 line
 * set PB10 to logical 0
 * set PA4 to logical 1
-* set PA8 in input mode, pullup
+* set PA8 in input mode
 * set PA1 in analog mode
 * get value from ADC1 channel 1
 * enable EXTI4 line
@@ -40,13 +40,11 @@ In idle state, PA4 is in interrupt mode awaiting for touches. You can't draw and
 LCD_Init();
 LCD_Touch_Init(&hadc2, ADC_CHANNEL_4, &hadc1, ADC_CHANNEL_1);
 LCD_SetMode(TOUCH);
-LCD_TouchPoint p;  // if you need to get the touch position
+LCD_TouchPoint p;
 
 while (1) {
-    LCD_Touch_Read();
-    LCD_Touch_GetLast(&p);  // retrieves the last verified touch in `&p`
-    LCD_Touch_DrawLastStroke();
-    LCD_Touch_PrintInfo();
+    LCD_Touch_Read(&p);  // read raw touch point
+    // do whatever you want with the touch point `p`
 }
 ```
 

@@ -45,11 +45,7 @@ typedef enum {
 void LCD_Touch_Init(ADC_HandleTypeDef* hadcX, uint32_t ADC_ChannelX, ADC_HandleTypeDef* hadcY, uint32_t ADC_ChannelY);
 HAL_StatusTypeDef LCD_SetMode(LCD_Mode mode);
 
-int8_t LCD_Touch_Read();
-int8_t LCD_Touch_GetLast(LCD_TouchPoint* p);
-int8_t LCD_Touch_DrawLastStroke();
-void LCD_Touch_PrintInfo();
-
+int8_t LCD_Touch_Read(LCD_TouchPoint* p);
 void LCD_Touch_OnDown();
 void LCD_Touch_OnUp();
 LCD_TouchState LCD_Touch_GetState();

@@ -58,7 +58,7 @@
 
 /* Private variables ---------------------------------------------------------*/
 /* USER CODE BEGIN PV */
-
+extern int32_t m_touch_id;
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -221,6 +221,7 @@ void EXTI4_IRQHandler(void) {
 			LCD_Touch_OnDown();
 		} else {
 			LCD_Touch_OnUp();
+			m_touch_id = -1;
 		}
 	}
 	HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_4);
