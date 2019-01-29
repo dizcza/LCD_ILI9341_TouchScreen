@@ -4,8 +4,13 @@
   * Description        : This file provides code for the configuration
   *                      of the ADC instances.
   ******************************************************************************
+  ** This notice applies to any and all portions of this file
+  * that are not between comment pairs USER CODE BEGIN and
+  * USER CODE END. Other portions of this file, whether 
+  * inserted by the user or by software development tools
+  * are owned by their respective copyright owners.
   *
-  * COPYRIGHT(c) 2016 STMicroelectronics
+  * COPYRIGHT(c) 2019 STMicroelectronics
   *
   * Redistribution and use in source and binary forms, with or without modification,
   * are permitted provided that the following conditions are met:
@@ -35,8 +40,6 @@
 /* Includes ------------------------------------------------------------------*/
 #include "adc.h"
 
-#include "gpio.h"
-
 /* USER CODE BEGIN 0 */
 
 /* USER CODE END 0 */
@@ -47,10 +50,10 @@ ADC_HandleTypeDef hadc2;
 /* ADC1 init function */
 void MX_ADC1_Init(void)
 {
-  ADC_ChannelConfTypeDef sConfig;
+  ADC_ChannelConfTypeDef sConfig = {0};
 
-    /**Configure the global features of the ADC (Clock, Resolution, Data Alignment and number of conversion) 
-    */
+  /**Configure the global features of the ADC (Clock, Resolution, Data Alignment and number of conversion) 
+  */
   hadc1.Instance = ADC1;
   hadc1.Init.ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV4;
   hadc1.Init.Resolution = ADC_RESOLUTION_12B;
@@ -58,6 +61,7 @@ void MX_ADC1_Init(void)
   hadc1.Init.ContinuousConvMode = DISABLE;
   hadc1.Init.DiscontinuousConvMode = DISABLE;
   hadc1.Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_NONE;
+  hadc1.Init.ExternalTrigConv = ADC_SOFTWARE_START;
   hadc1.Init.DataAlign = ADC_DATAALIGN_RIGHT;
   hadc1.Init.NbrOfConversion = 1;
   hadc1.Init.DMAContinuousRequests = DISABLE;
@@ -66,9 +70,8 @@ void MX_ADC1_Init(void)
   {
     Error_Handler();
   }
-
-    /**Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time. 
-    */
+  /**Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time. 
+  */
   sConfig.Channel = ADC_CHANNEL_1;
   sConfig.Rank = 1;
   sConfig.SamplingTime = ADC_SAMPLETIME_3CYCLES;
@@ -81,10 +84,10 @@ void MX_ADC1_Init(void)
 /* ADC2 init function */
 void MX_ADC2_Init(void)
 {
-  ADC_ChannelConfTypeDef sConfig;
+  ADC_ChannelConfTypeDef sConfig = {0};
 
-    /**Configure the global features of the ADC (Clock, Resolution, Data Alignment and number of conversion) 
-    */
+  /**Configure the global features of the ADC (Clock, Resolution, Data Alignment and number of conversion) 
+  */
   hadc2.Instance = ADC2;
   hadc2.Init.ClockPrescaler = ADC_CLOCK_SYNC_PCLK_DIV4;
   hadc2.Init.Resolution = ADC_RESOLUTION_12B;
@@ -92,6 +95,7 @@ void MX_ADC2_Init(void)
   hadc2.Init.ContinuousConvMode = DISABLE;
   hadc2.Init.DiscontinuousConvMode = DISABLE;
   hadc2.Init.ExternalTrigConvEdge = ADC_EXTERNALTRIGCONVEDGE_NONE;
+  hadc2.Init.ExternalTrigConv = ADC_SOFTWARE_START;
   hadc2.Init.DataAlign = ADC_DATAALIGN_RIGHT;
   hadc2.Init.NbrOfConversion = 1;
   hadc2.Init.DMAContinuousRequests = DISABLE;
@@ -100,9 +104,8 @@ void MX_ADC2_Init(void)
   {
     Error_Handler();
   }
-
-    /**Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time. 
-    */
+  /**Configure for the selected ADC regular channel its corresponding rank in the sequencer and its sample time. 
+  */
   sConfig.Channel = ADC_CHANNEL_4;
   sConfig.Rank = 1;
   sConfig.SamplingTime = ADC_SAMPLETIME_3CYCLES;
@@ -116,15 +119,16 @@ void MX_ADC2_Init(void)
 void HAL_ADC_MspInit(ADC_HandleTypeDef* adcHandle)
 {
 
-  GPIO_InitTypeDef GPIO_InitStruct;
+  GPIO_InitTypeDef GPIO_InitStruct = {0};
   if(adcHandle->Instance==ADC1)
   {
   /* USER CODE BEGIN ADC1_MspInit 0 */
 
   /* USER CODE END ADC1_MspInit 0 */
-    /* Peripheral clock enable */
+    /* ADC1 clock enable */
     __HAL_RCC_ADC1_CLK_ENABLE();
   
+    __HAL_RCC_GPIOA_CLK_ENABLE();
     /**ADC1 GPIO Configuration    
     PA1     ------> ADC1_IN1 
     */
@@ -142,9 +146,10 @@ void HAL_ADC_MspInit(ADC_HandleTypeDef* adcHandle)
   /* USER CODE BEGIN ADC2_MspInit 0 */
 
   /* USER CODE END ADC2_MspInit 0 */
-    /* Peripheral clock enable */
+    /* ADC2 clock enable */
     __HAL_RCC_ADC2_CLK_ENABLE();
   
+    __HAL_RCC_GPIOA_CLK_ENABLE();
     /**ADC2 GPIO Configuration    
     PA4     ------> ADC2_IN4 
     */
@@ -201,13 +206,5 @@ void HAL_ADC_MspDeInit(ADC_HandleTypeDef* adcHandle)
 /* USER CODE BEGIN 1 */
 
 /* USER CODE END 1 */
-
-/**
-  * @}
-  */
-
-/**
-  * @}
-  */
 
 /************************ (C) COPYRIGHT STMicroelectronics *****END OF FILE****/
