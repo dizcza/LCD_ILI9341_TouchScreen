@@ -21,8 +21,6 @@
 #ifndef __LCD_TOUCH_H
 #define __LCD_TOUCH_H
 
-#define LCD_TOUCH_TOLERANCE_PX 0.5
-
 #include "lcd.h"
 #include "stm32f4xx_hal.h"
 
