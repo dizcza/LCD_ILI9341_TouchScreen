@@ -97,7 +97,6 @@ static uint32_t touchY() {
 	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_SET);
 
 	uint32_t adc_y = ADC_GetValue(hadcY, ADC_ChannelY);
-	HAL_Delay(10);
 
 	//FIXME: after enabling EXTI4 TOUCH_DOWN interrupt is generated
 	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_RESET);
