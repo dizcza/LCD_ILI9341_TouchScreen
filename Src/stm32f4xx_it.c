@@ -215,14 +215,11 @@ void SysTick_Handler(void)
 /* USER CODE BEGIN 1 */
 
 void EXTI4_IRQHandler(void) {
-//	LCD_Printf("EXTI4 %d\n", __HAL_GPIO_EXTI_GET_IT(GPIO_PIN_4));
-	if (__HAL_GPIO_EXTI_GET_IT(GPIO_PIN_4) != RESET) {
-		if (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_4) == GPIO_PIN_RESET) {
-			LCD_Touch_OnDown();
-		} else {
-			LCD_Touch_OnUp();
-			m_touch_id = -1;
-		}
+	if (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_4) == GPIO_PIN_RESET) {
+		LCD_Touch_OnDown();
+	} else {
+		LCD_Touch_OnUp();
+		m_touch_id = -1;
 	}
 	HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_4);
 }
