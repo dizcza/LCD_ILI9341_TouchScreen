@@ -21,7 +21,7 @@ static ADC_HandleTypeDef* hadcX = NULL;
 static ADC_HandleTypeDef* hadcY = NULL;
 static uint32_t ADC_ChannelX;
 static uint32_t ADC_ChannelY;
-static LCD_TouchState m_touch_state = IDLE;
+static LCD_TouchState m_touch_state = LCD_TOUCH_IDLE;
 
 static float fclamp(float x, float l, float u) {
 	return x < l ? l : (x > u ? u : x);
@@ -181,11 +181,11 @@ static void GPIO_InterruptMode() {
  */
 HAL_StatusTypeDef LCD_SetMode(LCD_Mode mode) {
 	switch (mode) {
-	case TOUCH:
+	case LCD_MODE_TOUCH:
 		GPIO_InterruptMode();
 		return HAL_OK;
 
-	case DRAW:
+	case LCD_MODE_DRAW:
 		GPIO_DrawMode();
 		return HAL_OK;
 
@@ -201,7 +201,8 @@ int8_t LCD_Touch_Read(LCD_TouchPoint* p) {
 	if (hadcX == NULL || hadcY == NULL) {
 		return -1;
 	}
-	if (m_touch_state != TOUCH_DOWN) {
+	if (m_touch_state != LCD_TOUCH_DOWN) {
+		m_touch_state = LCD_TOUCH_IDLE;  // might be LCD_TOUCH_UP
 		return 1;
 	}
 	uint32_t x = touchX();
@@ -216,15 +217,18 @@ int8_t LCD_Touch_Read(LCD_TouchPoint* p) {
 	p->y = (int16_t) ((1 - fclamp(adc_norm_y(y), 0.0f, 1.0f)) * TFTHEIGHT);
 	p->time = HAL_GetTick();
 
+	LCD_Touch_Draw_UpdateLastPoint(p);
+
 	return 0;
 }
 
 void LCD_Touch_OnDown() {
-	m_touch_state = TOUCH_DOWN;
+	m_touch_state = LCD_TOUCH_DOWN;
 }
 
 void LCD_Touch_OnUp() {
-	m_touch_state = TOUCH_UP;
+	m_touch_state = LCD_TOUCH_UP;
+	LCD_Touch_Draw_Reset();
 }
 
 LCD_TouchState LCD_Touch_GetState() {

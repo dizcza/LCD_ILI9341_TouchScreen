@@ -67,15 +67,13 @@
 /* Private variables ---------------------------------------------------------*/
 
 /* USER CODE BEGIN PV */
-static LCD_TouchPoint m_touch_points[2];
-int32_t m_touch_id = -1;
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
 void SystemClock_Config(void);
 /* USER CODE BEGIN PFP */
-int8_t LCD_Touch_DrawLastStroke();
-void LCD_Touch_PrintInfo();
+
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
@@ -84,29 +82,7 @@ void LCD_Touch_PrintInfo();
 /**
  * Draws two last subsequent touches in a line.
  */
-int8_t LCD_Touch_DrawLastStroke() {
-	if (m_touch_id < 1) {
-		return -1;  // not enough touches in a stroke;
-	}
-	LCD_SetMode(DRAW);
-	LCD_TouchPoint* p_curr = &m_touch_points[m_touch_id % 2];
-	LCD_TouchPoint* p_prev = &m_touch_points[(m_touch_id - 1) % 2];
-	LCD_DrawLine(p_prev->x, p_prev->y, p_curr->x, p_curr->y, WHITE);
-	LCD_SetMode(TOUCH);
-	return 0;
-}
 
-void LCD_Touch_PrintInfo() {
-	LCD_SetMode(DRAW);
-	LCD_SetCursor(0, 0);
-	LCD_Printf("Stroke length: %5d\n", m_touch_id + 1);
-	if (m_touch_id >= 0) {
-		LCD_TouchPoint* p_curr = &m_touch_points[m_touch_id % 2];
-		LCD_Printf("Last touch: %3d %3d\n", p_curr->x, p_curr->y);
-	}
-	//FIXME starts constant TOUCH_UP interrupts
-	LCD_SetMode(TOUCH);
-}
 /* USER CODE END 0 */
 
 /**
@@ -147,7 +123,8 @@ int main(void)
 	LCD_SetTextColor(GREEN, BLACK);
 
 	LCD_Touch_Init(&hadc2, ADC_CHANNEL_4, &hadc1, ADC_CHANNEL_1);
-	LCD_SetMode(TOUCH);
+	LCD_SetMode(LCD_MODE_TOUCH);
+	LCD_TouchPoint p;
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -155,11 +132,9 @@ int main(void)
 
   while (1)
   {
-	  if (LCD_Touch_Read(&m_touch_points[(m_touch_id + 1) % 2]) == 0) {
-		  m_touch_id++;
-	  }
-	  LCD_Touch_DrawLastStroke();
-	  LCD_Touch_PrintInfo();
+	  LCD_Touch_Read(&p);
+	  LCD_Touch_Draw_DrawLastStroke();
+	  LCD_Touch_Draw_PrintInfo();
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
