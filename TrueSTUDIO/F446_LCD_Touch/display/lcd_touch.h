@@ -24,11 +24,6 @@
 #include "lcd.h"
 #include "stm32f4xx_hal.h"
 
-typedef struct LCD_TouchPoint {
-	int16_t x, y;
-	uint32_t time;
-} LCD_TouchPoint;
-
 typedef enum {
 	LCD_MODE_DRAW = 0,
 	LCD_MODE_TOUCH
@@ -37,8 +32,16 @@ typedef enum {
 typedef enum {
 	LCD_TOUCH_IDLE = 0,
 	LCD_TOUCH_DOWN,
+	LCD_TOUCH_MOVE,
 	LCD_TOUCH_UP
 } LCD_TouchState;
+
+typedef struct LCD_TouchPoint {
+	int16_t x, y;
+	uint32_t tick;  // touch time in ms
+	LCD_TouchState state;
+} LCD_TouchPoint;
+
 
 void LCD_Touch_Init(ADC_HandleTypeDef* hadcX, uint32_t ADC_ChannelX, ADC_HandleTypeDef* hadcY, uint32_t ADC_ChannelY);
 HAL_StatusTypeDef LCD_SetMode(LCD_Mode mode);
@@ -49,7 +52,7 @@ void LCD_Touch_OnUp();
 LCD_TouchState LCD_Touch_GetState();
 
 /* LCD Touch Draw */
-void LCD_Touch_Draw_Reset();
+void LCD_Touch_Draw_OnUp();
 void LCD_Touch_Draw_UpdateLastPoint(const LCD_TouchPoint* p);
 int8_t LCD_Touch_Draw_DrawLastStroke();
 void LCD_Touch_Draw_PrintInfo();

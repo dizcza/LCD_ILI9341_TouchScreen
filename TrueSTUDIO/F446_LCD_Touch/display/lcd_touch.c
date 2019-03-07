@@ -22,6 +22,7 @@ static ADC_HandleTypeDef* hadcY = NULL;
 static uint32_t ADC_ChannelX;
 static uint32_t ADC_ChannelY;
 static LCD_TouchState m_touch_state = LCD_TOUCH_IDLE;
+static LCD_TouchPoint* m_last_point_ref = NULL;
 
 static float fclamp(float x, float l, float u) {
 	return x < l ? l : (x > u ? u : x);
@@ -201,8 +202,7 @@ int8_t LCD_Touch_Read(LCD_TouchPoint* p) {
 	if (hadcX == NULL || hadcY == NULL) {
 		return -1;
 	}
-	if (m_touch_state != LCD_TOUCH_DOWN) {
-		m_touch_state = LCD_TOUCH_IDLE;  // might be LCD_TOUCH_UP
+	if (m_touch_state == LCD_TOUCH_IDLE) {
 		return 1;
 	}
 	uint32_t x = touchX();
@@ -215,20 +215,27 @@ int8_t LCD_Touch_Read(LCD_TouchPoint* p) {
 
 	p->x = (int16_t) ((1 - fclamp(adc_norm_x(x), 0.0f, 1.0f)) * TFTWIDTH);
 	p->y = (int16_t) ((1 - fclamp(adc_norm_y(y), 0.0f, 1.0f)) * TFTHEIGHT);
-	p->time = HAL_GetTick();
+	p->tick = HAL_GetTick();
+	p->state = m_touch_state;
 
+	m_last_point_ref = p;
 	LCD_Touch_Draw_UpdateLastPoint(p);
+
+	m_touch_state = LCD_TOUCH_MOVE;
 
 	return 0;
 }
 
 void LCD_Touch_OnDown() {
-	m_touch_state = LCD_TOUCH_DOWN;
+	if (m_touch_state == LCD_TOUCH_IDLE) {
+		m_touch_state = LCD_TOUCH_DOWN;
+	}
 }
 
 void LCD_Touch_OnUp() {
-	m_touch_state = LCD_TOUCH_UP;
-	LCD_Touch_Draw_Reset();
+	m_touch_state = LCD_TOUCH_IDLE;
+	m_last_point_ref->state = LCD_TOUCH_UP;
+	LCD_Touch_Draw_OnUp();
 }
 
 LCD_TouchState LCD_Touch_GetState() {

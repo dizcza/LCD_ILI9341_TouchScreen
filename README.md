@@ -48,6 +48,8 @@ while (1) {
 }
 ```
 
+`LCD_TouchPoint` is a struct that holds X and Y position, time, and touch state that could be one of `LCD_TOUCH_DOWN`, `LCD_TOUCH_MOVE`, or `LCD_TOUCH_UP`.
+
 ### YouTube Demo
 
 [![Demo CountPages alpha](http://i64.tinypic.com/e9svua.png)](https://www.youtube.com/watch?v=3GNu_ODub5Q&feature=youtu.be)
