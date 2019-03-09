@@ -4,6 +4,8 @@ Based on HAL for STM32 Nucleo F446RE. If you has a driver, different from ILI934
 
 You can import this project in Atollic TrueStudio, Ubuntu.
 
+TFT Shield: 2.4 Inch TFT LCD Shield ILI9341 HX8347 240x320 Touch Board 65K RGB (~$7).
+
 ### LCD Touch pinout
 
  *   Y- PB10
@@ -39,12 +41,13 @@ In idle state, PA4 is in interrupt mode awaiting for touches. You can't draw and
 
 LCD_Init();
 LCD_Touch_Init(&hadc2, ADC_CHANNEL_4, &hadc1, ADC_CHANNEL_1);
-LCD_SetMode(TOUCH);
+LCD_SetMode(LCD_MODE_TOUCH);
 LCD_TouchPoint p;
 
 while (1) {
-    LCD_Touch_Read(&p);  // read raw touch point
-    // do whatever you want with the touch point `p`
+    if (LCD_Touch_Read(&p) == LCD_TOUCH_READ_SUCCESS) {
+        // do whatever you want with the touch point `p`
+    }
 }
 ```
 

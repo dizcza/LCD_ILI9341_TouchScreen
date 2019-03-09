@@ -36,6 +36,13 @@ typedef enum {
 	LCD_TOUCH_UP
 } LCD_TouchState;
 
+typedef enum {
+	LCD_TOUCH_READ_SUCCESS = 0,
+	LCD_TOUCH_READ_NOT_INITIALIZED,
+	LCD_TOUCH_READ_NO_TOUCH,  // idle
+	LCD_TOUCH_READ_OUTSIDE
+} LCD_TouchReadState;
+
 typedef struct LCD_TouchPoint {
 	int16_t x, y;
 	uint32_t tick;  // touch time in ms

@@ -8,7 +8,7 @@
 #include <stdlib.h>
 #include "lcd_touch.h"
 
-#define ADC_NO_TOUCH_X (4095 - 100)
+#define ADC_NO_TOUCH_X_OUTSIDE (4095 - 100)
 #define TOUCH_ADC_X_MAX 3600
 #define TOUCH_ADC_X_MIN 500
 #define TOUCH_ADC_Y_MIN 300
@@ -200,15 +200,15 @@ HAL_StatusTypeDef LCD_SetMode(LCD_Mode mode) {
  */
 int8_t LCD_Touch_Read(LCD_TouchPoint* p) {
 	if (hadcX == NULL || hadcY == NULL) {
-		return -1;
+		return LCD_TOUCH_READ_NOT_INITIALIZED;
 	}
 	if (m_touch_state == LCD_TOUCH_IDLE) {
-		return 1;
+		return LCD_TOUCH_READ_NO_TOUCH;
 	}
 	uint32_t x = touchX();
 
-	if (x > ADC_NO_TOUCH_X) {
-		return 1;
+	if (x > ADC_NO_TOUCH_X_OUTSIDE) {
+		return LCD_TOUCH_READ_OUTSIDE;
 	}
 
 	uint32_t y = touchY();
@@ -223,7 +223,7 @@ int8_t LCD_Touch_Read(LCD_TouchPoint* p) {
 
 	m_touch_state = LCD_TOUCH_MOVE;
 
-	return 0;
+	return LCD_TOUCH_READ_SUCCESS;
 }
 
 void LCD_Touch_OnDown() {
