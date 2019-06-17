@@ -41,26 +41,27 @@ void LCD_Touch_Draw_ConnectLastPoint(const LCD_TouchPoint* p) {
 }
 
 void LCD_Touch_Draw_PrintInfo() {
+	if (m_last_touch_point.state == LCD_TOUCH_IDLE) {
+		// no touch is made
+		return;
+	}
 	LCD_SetMode(LCD_MODE_DRAW);
 	LCD_SetCursor(0, 0);
-	if (m_last_touch_point.state != LCD_TOUCH_IDLE) {
-		LCD_Printf("Last touch: x=%3d y=%3d\n", m_last_touch_point.x, m_last_touch_point.y);
-		switch (m_last_touch_point.state) {
-		case LCD_TOUCH_DOWN:
-			LCD_Printf("LCD_TOUCH_DOWN\n");
-			break;
-		case LCD_TOUCH_MOVE:
-			LCD_Printf("LCD_TOUCH_MOVE\n");
-			break;
-		case LCD_TOUCH_UP:
-			LCD_Printf("LCD_TOUCH_UP  \n");
-			break;
-		case LCD_TOUCH_IDLE:
-		default:
-			// should never be here
-			LCD_Printf("(invalid touch state)\n");
-			break;
-		}
+	LCD_Printf("Last touch: x=%3d y=%3d\n", m_last_touch_point.x, m_last_touch_point.y);
+	switch (m_last_touch_point.state) {
+	case LCD_TOUCH_DOWN:
+		LCD_Printf("LCD_TOUCH_DOWN\n");
+		break;
+	case LCD_TOUCH_MOVE:
+		LCD_Printf("LCD_TOUCH_MOVE\n");
+		break;
+	case LCD_TOUCH_UP:
+		LCD_Printf("LCD_TOUCH_UP  \n");
+		break;
+	default:
+		// should never be here
+		LCD_Printf("(invalid touch state)\n");
+		break;
 	}
 	//FIXME starts constant TOUCH_UP interrupts
 	LCD_SetMode(LCD_MODE_TOUCH);
