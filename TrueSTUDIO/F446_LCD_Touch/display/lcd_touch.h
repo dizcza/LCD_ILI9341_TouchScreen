@@ -62,5 +62,6 @@ LCD_TouchState LCD_Touch_GetState();
 void LCD_Touch_Draw_ConnectLastPoint(const LCD_TouchPoint* p);
 void LCD_Touch_Draw_PrintInfo();
 void LCD_Touch_Draw_OnUp();
+void LCD_Touch_Draw_Update();
 
 #endif /* __LCD_TOUCH_H */

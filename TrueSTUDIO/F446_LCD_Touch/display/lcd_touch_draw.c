@@ -17,6 +17,8 @@ static LCD_TouchPoint m_last_touch_point = {
 		.state=LCD_TOUCH_IDLE
 };
 
+static uint8_t m_is_redraw_needed = 0U;
+
 static void DrawTouchPoint(const LCD_TouchPoint* p) {
 	if (p->state == LCD_TOUCH_DOWN) {
 		LCD_FillCircle(p->x, p->y, LCD_TOUCH_DRAW_POINT_RADIUS, GREEN);
@@ -67,10 +69,18 @@ void LCD_Touch_Draw_PrintInfo() {
 	LCD_SetMode(LCD_MODE_TOUCH);
 }
 
+void LCD_Touch_Draw_Update() {
+	// special care for the LCD_TOUCH_UP event
+	if (m_is_redraw_needed) {
+		LCD_SetMode(LCD_MODE_DRAW);
+		DrawTouchPoint(&m_last_touch_point);
+		LCD_SetMode(LCD_MODE_TOUCH);
+		LCD_Touch_Draw_PrintInfo();
+	}
+	m_is_redraw_needed = 0U;
+}
+
 void LCD_Touch_Draw_OnUp() {
 	m_last_touch_point.state = LCD_TOUCH_UP;
-	LCD_SetMode(LCD_MODE_DRAW);
-	DrawTouchPoint(&m_last_touch_point);
-	LCD_SetMode(LCD_MODE_TOUCH);
-	LCD_Touch_Draw_PrintInfo();
+	m_is_redraw_needed = 1U;
 }

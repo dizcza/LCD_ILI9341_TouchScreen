@@ -136,6 +136,7 @@ int main(void)
 		  LCD_Touch_Draw_ConnectLastPoint(&p);
 		  LCD_Touch_Draw_PrintInfo();
 	  }
+	  LCD_Touch_Draw_Update();
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
