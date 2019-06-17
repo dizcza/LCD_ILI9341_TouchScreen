@@ -4,7 +4,7 @@
 *
 *	STM32 LCD TFT Library for 2.4" MCUfriend shield using 8080 8-bit parallel interface
 *	based on Adafruit GFX & Adafruit TFT LCD libraries
-*	20 Dec 2018 by Alexander Olenyev <sasha@techmaker.ua>
+*	24 May 2019 by Alexander Olenyev <sasha@techmaker.ua>
 *
 *	Changelog:
 *		- v1.7 added support for 24-bit BMP
@@ -63,6 +63,7 @@ POSSIBILITY OF SUCH DAMAGE.
 //#define ILI9325			// works!!
 //#define ILI9328			// works!!
 //#define ILI9340			// works!!
+//#define ILI9340_INV		// works!!
 //#define ILI9341			// works!!
 #define ILI9341_00		// works!!
 //#define R61505			// works!!
@@ -73,7 +74,7 @@ POSSIBILITY OF SUCH DAMAGE.
 //#define HX8347D			// works!!
 //#define HX8347G			// not tested yet
 //#define HX8357D			// not tested yet
-//#define SSD1297				// works!!
+//#define SSD1297			// works!!
 
 // Please uncomment one of the lines to select your LCD connection mode
 #define USE_8080_8BIT
@@ -88,11 +89,11 @@ POSSIBILITY OF SUCH DAMAGE.
 //#define WIPE_LINES
 
 #if !(defined(ILI9325) || defined(ILI9328) \
-		|| defined(ILI9340) || defined(ILI9341) || defined(ILI9341_00) \
+		|| defined(ILI9340) || defined(ILI9340_INV) || defined(ILI9341) || defined(ILI9341_00) \
 		|| defined(R61505) || defined(R61505V) || defined(R61520) || defined(S6D0154) \
 		|| defined (UNKNOWN1602) || defined(HX8347D) || defined(HX8347G) || defined(HX8357D) \
 		|| defined (SSD1297))
-#error Please select your LCD chip in lcd.h, lines 63-76
+#error Please select your LCD chip in lcd.h, lines 63-77
 #endif
 
 #if defined (USE_FATFS)
@@ -100,7 +101,7 @@ POSSIBILITY OF SUCH DAMAGE.
 #endif
 
 #if !(defined(USE_8080_8BIT) || defined(USE_FSMC))
-#error Please select your LCD connection mode in lcd.h, lines 79-80
+#error Please select your LCD connection mode in lcd.h, lines 80-81
 #endif
 
 #define TFTWIDTH			240

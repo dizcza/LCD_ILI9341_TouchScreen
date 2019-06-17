@@ -4,9 +4,10 @@
 *
 *	STM32 LCD TFT Library for 2.4" MCUfriend shield using 8080 8-bit parallel interface
 *	based on Adafruit GFX & Adafruit TFT LCD libraries
-*	20 Dec 2018 by Alexander Olenyev <sasha@techmaker.ua>
+*	24 May 2019 by Alexander Olenyev <sasha@techmaker.ua>
 *
 *	Changelog:
+*		- v1.8 added support for ILI9340_INV
 *		- v1.7 added support for 24-bit BMP
 *		- v1.6 added support for SSD1297 (262k only)
 *		- v1.5 added printf wipe line/screen defines
@@ -189,6 +190,33 @@ static const uint8_t ILI9340_regValues[] = {
 	ILI9341_POSITIVEGAMMACORR	,15, 0x0f,0x31,0x2b,0x0c,0x0e,0x08,0x4e,0xf1,0x37,0x07,0x10,0x03,0x0e,0x09,0x00,
 	ILI9341_NEGATIVEGAMMACORR	,15, 0x00,0x0e,0x14,0x03,0x11,0x07,0x31,0xC1,0x48,0x08,0x0f,0x0c,0x31,0x36,0x0f,
 	ILI9341_INVERTON			, 0,
+	ILI9341_SLEEPOUT			, 0,
+	TFTLCD_DELAY				, 150,
+	ILI9341_DISPLAYON			, 0,
+	ILI9341_MEMORYWRITE			, 0,
+};
+#elif defined(ILI9340_INV)
+static const uint8_t ILI9340_regValues[] = {
+	ILI9341_SOFTRESET			, 0,
+	ILI9341_POWERCONTROLA		, 5, 0x39, 0x2C, 0x00, 0x34, 0x02,
+	ILI9341_POWERCONTROLB		, 3, 0x00, 0xC1, 0x30,
+	ILI9341_DRIVERTIMINGCTLA	, 3, 0x85, 0x00, 0x78,
+	ILI9341_DRIVERTIMINGCTLB	, 2, 0x00, 0x00,
+	ILI9341_POWERONSEQCONTROL	, 4, 0x64, 0x03, 0x12, 0x81,
+	ILI9341_PUMPRATIOCONTROL	, 1, 0x20,
+	ILI9341_POWERCONTROL1		, 1, 0x23,
+	ILI9341_POWERCONTROL2		, 1, 0x10,
+	ILI9341_VCOMCONTROL1		, 2, 0x3E, 0x28,
+	ILI9341_VCOMCONTROL2		, 1, 0x86,
+	ILI9341_MEMCONTROL			, 1, ILI9341_MADCTL_MX | ILI9341_MADCTL_MY | ILI9341_MADCTL_BGR, // change rotation here
+	ILI9341_PIXELFORMAT			, 1, 0x55,
+	ILI9341_FRAMECONTROL		, 2, 0x00, 0x18,
+	ILI9341_DISPLAYFUNC			, 3, 0x08, 0x82, 0x27,
+	ILI9341_ENABLE3G			, 1, 0x00,
+	ILI9341_GAMMASET			, 1, 0x01,
+	ILI9341_POSITIVEGAMMACORR	,15, 0x0f,0x31,0x2b,0x0c,0x0e,0x08,0x4e,0xf1,0x37,0x07,0x10,0x03,0x0e,0x09,0x00,
+	ILI9341_NEGATIVEGAMMACORR	,15, 0x00,0x0e,0x14,0x03,0x11,0x07,0x31,0xC1,0x48,0x08,0x0f,0x0c,0x31,0x36,0x0f,
+	ILI9341_INVERTOFF			, 0,
 	ILI9341_SLEEPOUT			, 0,
 	TFTLCD_DELAY				, 150,
 	ILI9341_DISPLAYON			, 0,
@@ -1203,7 +1231,7 @@ void LCD_DrawPixel(int16_t x, int16_t y, uint16_t color) {
 	LCD_Write16Register16(ILI932X_GRAM_HOR_AD, x);
 	LCD_Write16Register16(ILI932X_GRAM_VER_AD, y);
 	LCD_Write16Register16(ILI932X_GRAM_WR, color);
-#elif defined(ILI9340) || defined(ILI9341) || defined(ILI9341_00) || defined(R61520) || defined(UNKNOWN1602)	
+#elif defined(ILI9340) || defined(ILI9340_INV) || defined(ILI9341) || defined(ILI9341_00) || defined(R61520) || defined(UNKNOWN1602)	
 	LCD_SetAddrWindow(x, y, m_width - 1, m_height - 1);
 	LCD_CS_ACTIVE();
 	LCD_Write16Register8(ILI9341_MEMORYWRITE, color);
@@ -1259,7 +1287,7 @@ void LCD_Flood(uint16_t color, uint32_t len) {
 
 #if	defined(ILI9325) || defined(ILI9328) || defined(R61505) || defined(R61505V) || defined(S6D0154)
 	LCD_Write16Register16(ILI932X_GRAM_WR, color);
-#elif defined(ILI9340) || defined(ILI9341) || defined(ILI9341_00) || defined(R61520) || defined(UNKNOWN1602)
+#elif defined(ILI9340) || defined(ILI9340_INV) || defined(ILI9341) || defined(ILI9341_00) || defined(R61520) || defined(UNKNOWN1602)
 	LCD_Write16Register8(ILI9341_MEMORYWRITE, color);
 #elif defined(HX8347D) || defined(HX8347G)
 	LCD_Write16Register8(HX8347G_SRAM_WR, color);
@@ -1343,7 +1371,7 @@ void LCD_FillScreen(uint16_t color) {
 	LCD_Write16Register16(ILI932X_GRAM_VER_AD, y);
 #endif
 	LCD_CS_IDLE();
-#elif defined(ILI9340) || defined(ILI9341) || defined(ILI9341_00)\
+#elif defined(ILI9340) || defined(ILI9340_INV) || defined(ILI9341) || defined(ILI9341_00)\
 	|| defined(R61520) || defined(S6D0154) \
 	|| defined(UNKNOWN1602) || defined(HX8347D) || defined(HX8347G) || defined(HX8357D)
 	/*
@@ -1456,7 +1484,7 @@ void LCD_SetAddrWindow(uint16_t x1, uint16_t y1, uint16_t x2, uint16_t y2) {
 	LCD_Write16Register16(0x21, y);
 	LCD_Write8Register8(0x22, 0);
 #endif
-#elif defined(ILI9340) || defined(ILI9341) || defined(ILI9341_00) || defined(R61520) || defined(UNKNOWN1602)
+#elif defined(ILI9340) || defined(ILI9340_INV) || defined(ILI9341) || defined(ILI9341_00) || defined(R61520) || defined(UNKNOWN1602)
 	LCD_Write32Register8(ILI9341_COLADDRSET, (x1 << 16) | x2);
 	LCD_Write32Register8(ILI9341_PAGEADDRSET, (y1 << 16) | y2);
 #elif defined(HX8347D) || defined(HX8347G)
@@ -1543,6 +1571,17 @@ void LCD_SetRotation(uint8_t x) {
 		case 1: t = ILI9341_MADCTL_MV | ILI9341_MADCTL_BGR; break;
 		case 2: t = ILI9341_MADCTL_MY | ILI9341_MADCTL_BGR; break;
 		case 3:	t = ILI9341_MADCTL_MX | ILI9341_MADCTL_MY | ILI9341_MADCTL_MV | ILI9341_MADCTL_BGR; break;
+    }
+    LCD_Write8Register8(ILI9341_MADCTL, t); // MADCTL
+    // For 9341, init default full-screen address window:
+    LCD_SetAddrWindow(0, 0, m_width - 1, m_height - 1);
+#elif defined(ILI9340_INV) 
+	uint8_t t;
+    switch (m_rotation) {
+		default: t = ILI9341_MADCTL_MX | ILI9341_MADCTL_MY | ILI9341_MADCTL_BGR; break;
+		case 1: t = ILI9341_MADCTL_MV | ILI9341_MADCTL_MY | ILI9341_MADCTL_BGR; break;
+		case 2: t = ILI9341_MADCTL_BGR; break;
+		case 3:	t = ILI9341_MADCTL_MX | ILI9341_MADCTL_MV | ILI9341_MADCTL_BGR; break;
     }
     LCD_Write8Register8(ILI9341_MADCTL, t); // MADCTL
     // For 9341, init default full-screen address window:
@@ -1654,7 +1693,7 @@ void LCD_DrawBMP(int16_t xPos, int16_t yPos, const uint8_t *pBmp) {
 #if	defined(ILI9325) || defined(ILI9328) || defined(R61505) || defined(R61505V) || defined(S6D0154)
 	LCD_Write8(0x00); // High byte of GRAM register...
 	LCD_Write8(ILI932X_GRAM_WR); // Write data to GRAM
-#elif defined(ILI9340) || defined(ILI9341) || defined(ILI9341_00) || defined(R61520) || defined(UNKNOWN1602)
+#elif defined(ILI9340) || defined(ILI9340_INV) || defined(ILI9341) || defined(ILI9341_00) || defined(R61520) || defined(UNKNOWN1602)
 	LCD_Write8(ILI9341_MEMORYWRITE); // Write data to GRAM
 #elif defined(HX8347D) || defined(HX8347G)
 	LCD_Write8(HX8347G_SRAM_WR); // Write data to GRAM
@@ -1687,8 +1726,8 @@ void LCD_DrawBMP(int16_t xPos, int16_t yPos, const uint8_t *pBmp) {
 				LCD_Write8(*(ptr + 1));
 				LCD_Write8(*(ptr));
 #else
-				LCD_Write8((*(ptr) & 0xF8) | (*(ptr + 1) >> 5));
-				LCD_Write8(((*(ptr + 1) & 0x1C) << 3) | (*(ptr + 2) >> 3));
+				LCD_Write8((*(ptr + 2) & 0xF8) | (*(ptr + 1) >> 5));
+				LCD_Write8(((*(ptr + 1) & 0x1C) << 3) | (*(ptr) >> 3));
 #endif
 				ptr += 3;
 			}
@@ -1726,8 +1765,8 @@ void LCD_DrawBMP(int16_t xPos, int16_t yPos, const uint8_t *pBmp) {
 					LCD_Write8(*(ptr + 1));
 					LCD_Write8(*(ptr));
 #else
-					LCD_Write8((*(ptr) & 0xF8) | (*(ptr + 1) >> 5));
-					LCD_Write8(((*(ptr + 1) & 0x1C) << 3) | (*(ptr + 2) >> 3));
+					LCD_Write8((*(ptr + 2) & 0xF8) | (*(ptr + 1) >> 5));
+					LCD_Write8(((*(ptr + 1) & 0x1C) << 3) | (*(ptr) >> 3));
 #endif
 					ptr += 3;
 				}
@@ -1790,7 +1829,7 @@ void LCD_DrawBMPFromFile(int16_t xPos, int16_t yPos, FIL * pFile) {
 #if	defined(ILI9325) || defined(ILI9328) || defined(R61505) || defined(R61505V) || defined(S6D0154)
 	LCD_Write8(0x00); // High byte of GRAM register...
 	LCD_Write8(ILI932X_GRAM_WR); // Write data to GRAM
-#elif defined(ILI9340) || defined(ILI9341) || defined(ILI9341_00) || defined(R61520) || defined(UNKNOWN1602)
+#elif defined(ILI9340) || defined(ILI9340_INV) || defined(ILI9341) || defined(ILI9341_00) || defined(R61520) || defined(UNKNOWN1602)
 	LCD_Write8(ILI9341_MEMORYWRITE); // Write data to GRAM
 #elif defined(HX8347D) || defined(HX8347G)
 	LCD_Write8(HX8347G_SRAM_WR); // Write data to GRAM
@@ -1832,8 +1871,8 @@ void LCD_DrawBMPFromFile(int16_t xPos, int16_t yPos, FIL * pFile) {
 					LCD_Write8(*(pBmp + 1));
 					LCD_Write8(*(pBmp));
 #else
-					LCD_Write8((*(pBmp) & 0xF8) | (*(pBmp + 1) >> 5));
-					LCD_Write8(((*(pBmp + 1) & 0x1C) << 3) | (*(pBmp + 2) >> 3));
+					LCD_Write8((*(pBmp + 2) & 0xF8) | (*(pBmp + 1) >> 5));
+					LCD_Write8(((*(pBmp + 1) & 0x1C) << 3) | (*(pBmp) >> 3));
 #endif
 					pBmp += 3;
 				}
@@ -1868,8 +1907,8 @@ void LCD_DrawBMPFromFile(int16_t xPos, int16_t yPos, FIL * pFile) {
 					LCD_Write8(*(pBmp + 1));
 					LCD_Write8(*(pBmp));
 #else
-					LCD_Write8((*(pBmp) & 0xF8) | (*(pBmp + 1) >> 5));
-					LCD_Write8(((*(pBmp + 1) & 0x1C) << 3) | (*(pBmp + 2) >> 3));
+					LCD_Write8((*(pBmp + 2) & 0xF8) | (*(pBmp + 1) >> 5));
+					LCD_Write8(((*(pBmp + 1) & 0x1C) << 3) | (*(pBmp) >> 3));
 #endif
 					pBmp += 3;
 				}
