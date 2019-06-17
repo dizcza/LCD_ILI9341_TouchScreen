@@ -198,7 +198,7 @@ HAL_StatusTypeDef LCD_SetMode(LCD_Mode mode) {
 /*
  * Reads raw touch x- and y-positions and stores them in the LCD_TouchPoint point.
  */
-int8_t LCD_Touch_Read(LCD_TouchPoint* p) {
+LCD_TouchReadState LCD_Touch_Read(LCD_TouchPoint* p) {
 	if (hadcX == NULL || hadcY == NULL) {
 		return LCD_TOUCH_READ_NOT_INITIALIZED;
 	}
@@ -219,8 +219,6 @@ int8_t LCD_Touch_Read(LCD_TouchPoint* p) {
 	p->state = m_touch_state;
 
 	m_last_point_ref = p;
-	LCD_Touch_Draw_UpdateLastPoint(p);
-
 	m_touch_state = LCD_TOUCH_MOVE;
 
 	return LCD_TOUCH_READ_SUCCESS;

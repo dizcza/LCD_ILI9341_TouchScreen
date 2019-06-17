@@ -10,25 +10,12 @@
 
 #include "lcd_touch.h"
 
-static LCD_TouchPoint m_touch_points[2];
-static uint32_t m_num_touches = 0U;
-
-static void DrawTouchPoint(const LCD_TouchPoint* p);
-
-void LCD_Touch_Draw_OnUp() {
-	if (m_num_touches > 0) {
-		LCD_TouchPoint* p_last = &m_touch_points[(m_num_touches - 1) % 2];
-		p_last->state = LCD_TOUCH_UP;
-	}
-}
-
-void LCD_Touch_Draw_UpdateLastPoint(const LCD_TouchPoint* p) {
-	LCD_TouchPoint* p_update = &m_touch_points[m_num_touches++ % 2];
-	p_update->x = p->x;
-	p_update->y = p->y;
-	p_update->tick = p->tick;
-	p_update->state = p->state;
-}
+static LCD_TouchPoint m_last_touch_point = {
+		.x=0,
+		.y=0,
+		.tick=0,
+		.state=LCD_TOUCH_IDLE
+};
 
 static void DrawTouchPoint(const LCD_TouchPoint* p) {
 	if (p->state == LCD_TOUCH_DOWN) {
@@ -38,28 +25,27 @@ static void DrawTouchPoint(const LCD_TouchPoint* p) {
 	}
 }
 
-int8_t LCD_Touch_Draw_DrawLastStroke() {
-	if (m_num_touches < 2U) {
-		return 1;  // not enough touches in a stroke
+void LCD_Touch_Draw_ConnectLastPoint(const LCD_TouchPoint* p) {
+	if (m_last_touch_point.state == LCD_TOUCH_DOWN || m_last_touch_point.state == LCD_TOUCH_MOVE) {
+		// connect two last points
+		LCD_SetMode(LCD_MODE_DRAW);
+		LCD_DrawLine(m_last_touch_point.x, m_last_touch_point.y, p->x, p->y, WHITE);
+		DrawTouchPoint(&m_last_touch_point);
+		DrawTouchPoint(p);
+		LCD_SetMode(LCD_MODE_TOUCH);
 	}
-	LCD_SetMode(LCD_MODE_DRAW);
-	LCD_TouchPoint* p_curr = &m_touch_points[(m_num_touches - 1) % 2];
-	LCD_TouchPoint* p_prev = &m_touch_points[m_num_touches % 2];
-	LCD_DrawLine(p_prev->x, p_prev->y, p_curr->x, p_curr->y, WHITE);
-	DrawTouchPoint(p_prev);
-	DrawTouchPoint(p_curr);
-	LCD_SetMode(LCD_MODE_TOUCH);
-	return 0;
+	m_last_touch_point.x = p->x;
+	m_last_touch_point.y = p->y;
+	m_last_touch_point.tick = p->tick;
+	m_last_touch_point.state = p->state;
 }
 
 void LCD_Touch_Draw_PrintInfo() {
 	LCD_SetMode(LCD_MODE_DRAW);
 	LCD_SetCursor(0, 0);
-	LCD_Printf("Stroke size: %5d\n", m_num_touches);
-	if (m_num_touches > 0U) {
-		LCD_TouchPoint* p_curr = &m_touch_points[(m_num_touches - 1) % 2];
-		LCD_Printf("Last touch: x=%3d y=%3d\n", p_curr->x, p_curr->y);
-		switch (p_curr->state) {
+	if (m_last_touch_point.state != LCD_TOUCH_IDLE) {
+		LCD_Printf("Last touch: x=%3d y=%3d\n", m_last_touch_point.x, m_last_touch_point.y);
+		switch (m_last_touch_point.state) {
 		case LCD_TOUCH_DOWN:
 			LCD_Printf("LCD_TOUCH_DOWN\n");
 			break;
@@ -68,7 +54,6 @@ void LCD_Touch_Draw_PrintInfo() {
 			break;
 		case LCD_TOUCH_UP:
 			LCD_Printf("LCD_TOUCH_UP  \n");
-			m_num_touches = 0U;
 			break;
 		case LCD_TOUCH_IDLE:
 		default:
@@ -79,4 +64,12 @@ void LCD_Touch_Draw_PrintInfo() {
 	}
 	//FIXME starts constant TOUCH_UP interrupts
 	LCD_SetMode(LCD_MODE_TOUCH);
+}
+
+void LCD_Touch_Draw_OnUp() {
+	m_last_touch_point.state = LCD_TOUCH_UP;
+	LCD_SetMode(LCD_MODE_DRAW);
+	DrawTouchPoint(&m_last_touch_point);
+	LCD_SetMode(LCD_MODE_TOUCH);
+	LCD_Touch_Draw_PrintInfo();
 }

@@ -132,9 +132,10 @@ int main(void)
 
   while (1)
   {
-	  LCD_Touch_Read(&p);
-	  LCD_Touch_Draw_DrawLastStroke();
-	  LCD_Touch_Draw_PrintInfo();
+	  if (LCD_Touch_Read(&p) == LCD_TOUCH_READ_SUCCESS) {
+		  LCD_Touch_Draw_ConnectLastPoint(&p);
+		  LCD_Touch_Draw_PrintInfo();
+	  }
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */

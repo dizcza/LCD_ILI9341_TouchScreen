@@ -30,7 +30,7 @@ typedef enum {
 } LCD_Mode;
 
 typedef enum {
-	LCD_TOUCH_IDLE = 0,
+	LCD_TOUCH_IDLE = 0,  // idle; no touch is made yet
 	LCD_TOUCH_DOWN,
 	LCD_TOUCH_MOVE,
 	LCD_TOUCH_UP
@@ -38,9 +38,9 @@ typedef enum {
 
 typedef enum {
 	LCD_TOUCH_READ_SUCCESS = 0,
-	LCD_TOUCH_READ_NOT_INITIALIZED,
+	LCD_TOUCH_READ_NOT_INITIALIZED,  // user did not call LCD_Touch_Init()
 	LCD_TOUCH_READ_NO_TOUCH,  // idle
-	LCD_TOUCH_READ_OUTSIDE
+	LCD_TOUCH_READ_OUTSIDE    // ADC value is outside of the acceptable range
 } LCD_TouchReadState;
 
 typedef struct LCD_TouchPoint {
@@ -53,15 +53,14 @@ typedef struct LCD_TouchPoint {
 void LCD_Touch_Init(ADC_HandleTypeDef* hadcX, uint32_t ADC_ChannelX, ADC_HandleTypeDef* hadcY, uint32_t ADC_ChannelY);
 HAL_StatusTypeDef LCD_SetMode(LCD_Mode mode);
 
-int8_t LCD_Touch_Read(LCD_TouchPoint* p);
+LCD_TouchReadState LCD_Touch_Read(LCD_TouchPoint* p);
 void LCD_Touch_OnDown();
 void LCD_Touch_OnUp();
 LCD_TouchState LCD_Touch_GetState();
 
 /* LCD Touch Draw */
-void LCD_Touch_Draw_OnUp();
-void LCD_Touch_Draw_UpdateLastPoint(const LCD_TouchPoint* p);
-int8_t LCD_Touch_Draw_DrawLastStroke();
+void LCD_Touch_Draw_ConnectLastPoint(const LCD_TouchPoint* p);
 void LCD_Touch_Draw_PrintInfo();
+void LCD_Touch_Draw_OnUp();
 
 #endif /* __LCD_TOUCH_H */

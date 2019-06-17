@@ -46,7 +46,11 @@ LCD_TouchPoint p;
 
 while (1) {
     if (LCD_Touch_Read(&p) == LCD_TOUCH_READ_SUCCESS) {
+        // draw the last stroke, for example
+        LCD_Touch_Draw_ConnectLastPoint(&p);
+
         // do whatever you want with the touch point `p`
+        ...
     }
 }
 ```
