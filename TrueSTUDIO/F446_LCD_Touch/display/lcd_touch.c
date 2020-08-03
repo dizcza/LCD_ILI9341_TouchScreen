@@ -2,7 +2,21 @@
  * lcd_touch.c
  *
  *  Created on: Oct 29, 2016
- *      Author: dizcza
+ *      Author: Danylo Ulianych
+ *
+ *
+ * An example of an interrupt handler that
+ * should be put in stm32f4xx_it.c:
+ *
+ *	void EXTI4_IRQHandler(void) {
+ *		if (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_4) == GPIO_PIN_RESET) {
+ *			LCD_Touch_OnDown();
+ *		} else {
+ *			LCD_Touch_OnUp();
+ *		}
+ *		HAL_GPIO_EXTI_IRQHandler(GPIO_PIN_4);
+ *	}
+ *
  */
 
 #include <stdlib.h>
@@ -99,8 +113,7 @@ static uint32_t touchY() {
 
 	uint32_t adc_y = ADC_GetValue(hadcY, ADC_ChannelY);
 
-	//FIXME: after enabling EXTI4 TOUCH_DOWN interrupt is generated
-	HAL_GPIO_WritePin(GPIOA, GPIO_PIN_4, GPIO_PIN_RESET);
+	__HAL_GPIO_EXTI_CLEAR_IT(GPIO_PIN_4);
 	HAL_NVIC_ClearPendingIRQ(EXTI4_IRQn);
 	HAL_NVIC_EnableIRQ(EXTI4_IRQn);
 
@@ -140,6 +153,8 @@ static void GPIO_DrawMode() {
 	HAL_GPIO_Init(GPIOB, &GPIO_InitStruct);
 }
 
+
+// TOUCH mode GPIO setup
 static void GPIO_InterruptMode() {
 	__GPIOA_CLK_ENABLE()
 	;
@@ -175,10 +190,12 @@ static void GPIO_InterruptMode() {
 	HAL_NVIC_EnableIRQ(EXTI4_IRQn);
 }
 
+
 /**
  * Set LCD's mode to either DRAW or TOUCH.
- * Set LCD_Mode to DRAW to draw anything with LCD, then switch back to TOUCH,
- * if you want to receive touches.
+ *
+ * Set LCD_Mode to DRAW to draw or print text on LCD,
+ * then switch back to TOUCH, if you want to receive touches.
  */
 HAL_StatusTypeDef LCD_SetMode(LCD_Mode mode) {
 	switch (mode) {
@@ -196,7 +213,8 @@ HAL_StatusTypeDef LCD_SetMode(LCD_Mode mode) {
 }
 
 /*
- * Reads raw touch x- and y-positions and stores them in the LCD_TouchPoint point.
+ * Reads raw touch x- and y-positions and, if successful,
+ * stores them in the LCD_TouchPoint point.
  */
 LCD_TouchReadState LCD_Touch_Read(LCD_TouchPoint* p) {
 	if (hadcX == NULL || hadcY == NULL) {
@@ -224,18 +242,39 @@ LCD_TouchReadState LCD_Touch_Read(LCD_TouchPoint* p) {
 	return LCD_TOUCH_READ_SUCCESS;
 }
 
+
+/*
+ * Indicates the start of a touch.
+ * Should be called from EXTIx_IRQHandler interrupt only.
+ */
 void LCD_Touch_OnDown() {
 	if (m_touch_state == LCD_TOUCH_IDLE) {
 		m_touch_state = LCD_TOUCH_DOWN;
 	}
 }
 
+
+/*
+ * Indicates the finish of a touch.
+ * Should be called from EXTIx_IRQHandler interrupt only.
+ */
 void LCD_Touch_OnUp() {
 	m_touch_state = LCD_TOUCH_IDLE;
-	m_last_point_ref->state = LCD_TOUCH_UP;
+
+	if (m_last_point_ref != NULL) {
+		// Mark the last read touch point as TOUCH_UP.
+		// Note that it changes the point state that the user specified
+		// as an argument to LCD_Touch_Read function.
+		m_last_point_ref->state = LCD_TOUCH_UP;
+	}
 	LCD_Touch_Draw_OnUp();
 }
 
+
+
+/*
+ * Returns the current touch state.
+ */
 LCD_TouchState LCD_Touch_GetState() {
 	return m_touch_state;
 }

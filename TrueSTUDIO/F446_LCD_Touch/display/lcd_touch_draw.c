@@ -2,7 +2,7 @@
  * lcd_touch_draw.c
  *
  *  Created on: Mar 7, 2019
- *      Author: dizcza
+ *      Author: Danylo Ulianych
  */
 
 
@@ -65,7 +65,8 @@ void LCD_Touch_Draw_PrintInfo() {
 		LCD_Printf("(invalid touch state)\n");
 		break;
 	}
-	//FIXME starts constant TOUCH_UP interrupts
+
+	//FIXME throws extra one or two TOUCH_UP interrupts
 	LCD_SetMode(LCD_MODE_TOUCH);
 }
 

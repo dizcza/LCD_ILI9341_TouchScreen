@@ -1,8 +1,21 @@
 /*
  * lcd_touch.h
  *
- * This library implements touch screen capabilities of TFTLCD, based on ILI9341 driver.
- * To change ILIxxxx driver, refer to lcd.h.
+ * This library implements touch screen capabilities of TFTLCD,
+ * based on lcd.h driver. To change the type of ILIxxxx driver
+ * of your TFTLCD, refer to lcd.h.
+ *
+ * 29 Oct 2016 by Danylo Ulianych
+ *
+ * Changelog:
+ *   - v1.0   03 Aug 2020   Updated lcd lib to v1.14.
+ *                          Converted the project to STMCubeIDE.
+ *                          Fixed bug in touchY() by clearing EXTI4 pending interrupt.
+ *   - v0.4   17 Jun 2019   Updated lcd lib to v1.8.
+ *   - v0.3   07 Mar 2019   Moved drawing-related functions to lcd_touch_draw.c.
+ *   - v0.2   29 Jan 2019   Updated lcd lib to v1.7.
+ *                          Converted the project to Atollic TrueStudio.
+ *   - v0.1   29 Oct 2016   First working prototype. SystemWorkbench IDE.
  *
  * LCD Touch pinout:
  *   Y- PB10
@@ -12,10 +25,9 @@
  *
  * In idle state, PA4 is in interrupt mode awaiting for touches.
  * You can't draw and await for touches simultaneously.
- * Set LCD_Mode to DRAW to draw anything with LCD, then switch back to TOUCH.
+ * Set LCD_Mode to DRAW to draw or print text on LCD,
+ * then switch back to TOUCH.
  *
- *  Created on: Oct 29, 2016
- *      Author: dizcza
  */
 
 #ifndef __LCD_TOUCH_H
@@ -50,15 +62,59 @@ typedef struct LCD_TouchPoint {
 } LCD_TouchPoint;
 
 
-void LCD_Touch_Init(ADC_HandleTypeDef* hadcX, uint32_t ADC_ChannelX, ADC_HandleTypeDef* hadcY, uint32_t ADC_ChannelY);
+
+// ------------------- Initialization and setup -------------------
+
+/**
+ * Saves ADC handles references to measure touch screen positions.
+ */
+void LCD_Touch_Init(ADC_HandleTypeDef* hadcX, uint32_t ADC_ChannelX,
+		            ADC_HandleTypeDef* hadcY, uint32_t ADC_ChannelY);
+
+
+/**
+ * Set LCD's mode to either DRAW or TOUCH.
+ *
+ * Set LCD_Mode to DRAW to draw or print text on LCD,
+ * then switch back to TOUCH, if you want to receive touches.
+ */
 HAL_StatusTypeDef LCD_SetMode(LCD_Mode mode);
 
+
+
+// ------------------- Reading a touch -------------------
+
+/*
+ * Reads raw touch x- and y-positions and, if successful,
+ * stores them in the LCD_TouchPoint point.
+ */
 LCD_TouchReadState LCD_Touch_Read(LCD_TouchPoint* p);
+
+/*
+ * Indicates the start of a touch.
+ * Should be called from EXTIx_IRQHandler interrupt only.
+ */
 void LCD_Touch_OnDown();
+
+
+/*
+ * Indicates the finish of a touch.
+ * Should be called from EXTIx_IRQHandler interrupt only.
+ */
 void LCD_Touch_OnUp();
+
+
+/*
+ * Returns the current touch state.
+ */
 LCD_TouchState LCD_Touch_GetState();
 
-/* LCD Touch Draw */
+
+
+// -------------------- Drawing the last touch --------------------
+// These functions are supplementary and provide a simple interface
+// of connecting the last touch points by drawing a line.
+
 void LCD_Touch_Draw_ConnectLastPoint(const LCD_TouchPoint* p);
 void LCD_Touch_Draw_PrintInfo();
 void LCD_Touch_Draw_OnUp();

@@ -1,10 +1,8 @@
 # ILI9341 TFTLCD Touch Screen driver
 
-Based on HAL for STM32 Nucleo F446RE. If you has a driver, different from ILI9341, refer to [`lcd.h`](TrueSTUDIO/F446_LCD_Touch/display/lcd.h).
+The [lcd-touch](TrueSTUDIO/F446_LCD_Touch/display/lcd_touch.h) library should work with all STM32 boards that have a compartment for TFT LCD shield\*. This project provides an example of how to use the lcd-touch lib on Nucleo F446RE. If your driver is different from ILI9341, refer to [`lcd.h`](TrueSTUDIO/F446_LCD_Touch/display/lcd.h).
 
-You can import this project in Atollic TrueStudio, Ubuntu.
-
-TFT Shield: 2.4 Inch TFT LCD Shield ILI9341 HX8347 240x320 Touch Board 65K RGB (~$7).
+\*TFT Shield: 2.4 Inch TFT LCD Shield ILI9341 HX8347 240x320 Touch Board 65K RGB (~$7).
 
 ### LCD Touch pinout
 
@@ -32,6 +30,7 @@ In idle state, PA4 is in interrupt mode awaiting for touches. You can't draw and
 * set PA8 in input mode
 * set PA1 in analog mode
 * get value from ADC1 channel 1
+* clear EXTI4 line pending interrupt
 * enable EXTI4 line
 
 
@@ -55,8 +54,20 @@ while (1) {
 }
 ```
 
-`LCD_TouchPoint` is a struct that holds X and Y position, time, and touch state that could be one of `LCD_TOUCH_DOWN`, `LCD_TOUCH_MOVE`, or `LCD_TOUCH_UP`.
+`LCD_TouchPoint` is a struct that holds X and Y position, time, and touch state that can be one of `LCD_TOUCH_DOWN`, `LCD_TOUCH_MOVE`, or `LCD_TOUCH_UP`.
 
-### YouTube Demo
+Note. Optimization flags other than None are unstable at the moment.
 
-[![Demo CountPages alpha](http://i64.tinypic.com/e9svua.png)](https://www.youtube.com/watch?v=3GNu_ODub5Q&feature=youtu.be)
+
+### Notes on IDE
+
+The project was originally written in SystemWorkbench, then converted to TrueAtollicStudio to become eventually suppressed by STMCubeIDE.
+
+OS: Ubuntu 18.04
+
+If you're unable to open/convert the project in one of the listed above IDEs, open an issue.
+
+
+### Demo on YouTube
+
+[![Demo](screenshot.jpg)](https://youtu.be/2-NuPZo1CeQ)
