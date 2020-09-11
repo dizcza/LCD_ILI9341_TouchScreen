@@ -58,6 +58,14 @@ void PendSV_Handler(void);
 void SysTick_Handler(void);
 /* USER CODE BEGIN EFP */
 
+/* Called upon
+ *   LCD_TOUCH_DOWN,
+ *   LCD_TOUCH_MOVE,
+ *   LCD_TOUCH_UP
+ * events, if LCD_MODE_TOUCH is selected.
+ */
+void EXTI4_IRQHandler(void);
+
 /* USER CODE END EFP */
 
 #ifdef __cplusplus

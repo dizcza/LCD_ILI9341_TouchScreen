@@ -200,6 +200,12 @@ void SysTick_Handler(void)
 
 /* USER CODE BEGIN 1 */
 
+/* Called upon
+ *   LCD_TOUCH_DOWN,
+ *   LCD_TOUCH_MOVE,
+ *   LCD_TOUCH_UP
+ * events, if LCD_MODE_TOUCH is selected.
+ */
 void EXTI4_IRQHandler(void) {
 	if (HAL_GPIO_ReadPin(GPIOA, GPIO_PIN_4) == GPIO_PIN_RESET) {
 		LCD_Touch_OnDown();

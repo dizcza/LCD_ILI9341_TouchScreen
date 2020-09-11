@@ -1,8 +1,10 @@
 # ILI9341 TFTLCD Touch Screen driver
 
-The [lcd-touch](TrueSTUDIO/F446_LCD_Touch/display/lcd_touch.h) library should work with all STM32 boards that have a compartment for TFT LCD shield\*. This project provides an example of how to use the lcd-touch lib on Nucleo F446RE. If your driver is different from ILI9341, refer to [`lcd.h`](TrueSTUDIO/F446_LCD_Touch/display/lcd.h).
+The [lcd-touch](display/lcd_touch.h) library should work with any STM32 board that has a compartment (slot) for TFT LCD shield\*. The rest of the project provides an example of how to use the lcd-touch lib on Nucleo F446RE. If your driver is different from ILI9341, refer to [`lcd.h`](display/lcd.h).
 
 \*TFT Shield: 2.4 Inch TFT LCD Shield ILI9341 HX8347 240x320 Touch Board 65K RGB (~$7).
+
+**The interface is not SPI**: instead, the communication with the LCD is done by acting directly on GPIO Pins and therefore is faster than an SPI alternative implementation, which you could probably find somewhere else.
 
 ### LCD Touch pinout
 
