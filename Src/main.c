@@ -93,7 +93,8 @@ int main(void)
 
 	LCD_Init();
 	LCD_FillScreen(BLACK);
-	LCD_SetTextSize(3);
+	LCD_SetTextSize(1);  // Font12
+	LCD_SetTextScaled(0);  // don't scale the text size by 2
 	LCD_SetTextColor(GREEN, BLACK);
 
 	LCD_Touch_Init(&hadc2, ADC_CHANNEL_4, &hadc1, ADC_CHANNEL_1);

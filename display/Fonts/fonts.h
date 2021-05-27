@@ -11,11 +11,11 @@ typedef struct
   
 } font_t;
 
-//#define USE_FONT8
+#define USE_FONT8
 #define USE_FONT12
-//#define USE_FONT16
-//#define USE_FONT20
-//#define USE_FONT24
+#define USE_FONT16
+#define USE_FONT20
+#define USE_FONT24
 
 //#define USE_CP1251
 
